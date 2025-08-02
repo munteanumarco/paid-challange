@@ -34,7 +34,10 @@
           </div>
           <div class="email-content" (click)="viewEmail(email, $event)">
             <div class="email-header">
-              <div class="email-sender">{{ email.sender }}</div>
+              <div class="email-participants">
+                <div class="email-sender">From: {{ email.sender }}</div>
+                <div class="email-receiver" *ngIf="email.gmail_account?.email">To: {{ email.gmail_account?.email }}</div>
+              </div>
               <div class="email-date">{{ email.received_at | date:'medium' }}</div>
             </div>
             <div class="email-subject">{{ email.subject }}</div>

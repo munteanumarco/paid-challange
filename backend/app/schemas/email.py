@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from .gmail_account import GmailAccount
 
 class EmailBase(BaseModel):
     gmail_id: str
@@ -22,9 +23,11 @@ class Email(EmailBase):
     id: int
     category_id: Optional[int] = None
     user_id: int
+    gmail_account_id: int
     is_archived: bool
     created_at: datetime
     updated_at: datetime
+    gmail_account: Optional[GmailAccount] = None
 
     class Config:
         from_attributes = True

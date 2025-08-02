@@ -13,6 +13,9 @@ export interface Email {
   category_id?: number;
   gmail_account_id: number;
   is_archived: boolean;
+  gmail_account?: {
+    email: string;
+  };
 }
 
 @Injectable({

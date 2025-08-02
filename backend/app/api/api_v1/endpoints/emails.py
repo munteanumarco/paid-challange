@@ -146,7 +146,7 @@ def list_emails(
     - search: Search in subject/content
     - skip/limit: Pagination
     """
-    query = db.query(Email).filter(Email.user_id == current_user.id)
+    query = db.query(Email).join(Email.gmail_account).filter(Email.user_id == current_user.id)
     
     if category_id is not None:
         query = query.filter(Email.category_id == category_id)
@@ -185,7 +185,7 @@ def get_email(
     current_user: User = Depends(deps.get_current_user)
 ):
     """Get a specific email"""
-    email = db.query(Email).filter(
+    email = db.query(Email).join(Email.gmail_account).filter(
         Email.id == email_id,
         Email.user_id == current_user.id
     ).first()

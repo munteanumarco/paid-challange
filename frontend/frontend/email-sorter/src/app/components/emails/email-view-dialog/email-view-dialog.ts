@@ -27,6 +27,9 @@ import { Email } from '../../../services/email';
         <div class="email-from">
           <strong>From:</strong> {{ data.sender }}
         </div>
+        <div class="email-to" *ngIf="data.gmail_account?.email">
+          <strong>To:</strong> {{ data.gmail_account.email }}
+        </div>
         <div class="email-date">
           <strong>Received:</strong> {{ data.received_at | date:'medium' }}
         </div>
@@ -78,12 +81,15 @@ import { Email } from '../../../services/email';
       background: #fff;
       border-bottom: 1px solid #e0e0e0;
       
-      .email-from, .email-date {
+      .email-from, .email-to, .email-date {
         margin-bottom: 8px;
         color: #5f6368;
+        line-height: 1.5;
         
         strong {
           color: #202124;
+          min-width: 80px;
+          display: inline-block;
         }
       }
     }

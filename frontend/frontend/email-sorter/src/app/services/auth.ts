@@ -104,15 +104,19 @@ export class AuthService {
 
   async handleDirectCallback(params: any): Promise<AuthResponse> {
     console.log('Handling direct callback with params:', params);
+    
+    if (!params.access_token) {
+      throw new Error('No access token received');
+    }
+
     const response: AuthResponse = {
       access_token: params.access_token,
-      token_type: params.token_type,
+      token_type: params.token_type || 'bearer',
       gmail_account_id: parseInt(params.gmail_account_id),
       message: params.message
     };
 
-    // Only update auth state if this is not a connect flow
-    if (!params.message?.includes('connected')) {
+    try {
       await this.handleAuthResponse(response);
       
       // Verify auth state
@@ -122,9 +126,13 @@ export class AuthService {
       if (!isAuth) {
         throw new Error('Failed to establish auth state after callback');
       }
+      
+      return response;
+    } catch (error) {
+      console.error('Error handling direct callback:', error);
+      this.logout(); // Clear any partial auth state
+      throw error;
     }
-    
-    return response;
   }
 
   private async handleAuthResponse(response: AuthResponse): Promise<void> {

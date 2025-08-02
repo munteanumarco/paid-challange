@@ -42,54 +42,47 @@ export class CallbackComponent implements OnInit {
     console.log('Callback component initialized');
     
     try {
-      const params = await this.route.queryParams.toPromise();
-      console.log('Query params:', params);
-      
-      if (!params) {
-        throw new Error('No query parameters received');
-      }
+      // Subscribe to query params instead of using toPromise
+      this.route.queryParams.subscribe(async params => {
+        console.log('Query params:', params);
+        
+        if (!params) {
+          throw new Error('No query parameters received');
+        }
 
-      const accessToken = params['access_token'];
-      const code = params['code'];
-      const error = params['error'];
-      
-      if (accessToken) {
-        // If we got the token directly from the backend redirect
-        console.log('Received access token from backend redirect');
-        await this.authService.handleDirectCallback(params);
-        console.log('Direct callback handled successfully');
+        const accessToken = params['access_token'];
+        const code = params['code'];
+        const error = params['error'];
         
-        // Double check auth state
-        const isAuth = this.authService.isAuthenticated();
-        console.log('Final auth state check:', isAuth ? 'authenticated' : 'not authenticated');
-        
-        if (isAuth) {
-          console.log('Auth confirmed, navigating to home');
-          await this.router.navigate(['/']);
-        } else {
-          throw new Error('Failed to establish auth state');
+        try {
+          if (accessToken) {
+            // If we got the token directly from the backend redirect
+            console.log('Received access token from backend redirect');
+            await this.authService.handleDirectCallback(params);
+            console.log('Direct callback handled successfully');
+            
+            // Navigate to dashboard after successful auth
+            await this.router.navigate(['/dashboard']);
+          } else if (code) {
+            // If we got the authorization code
+            console.log('Received authorization code');
+            await this.authService.handleGoogleCallback(code);
+            console.log('Code exchange successful');
+            
+            // Navigate to dashboard after successful auth
+            await this.router.navigate(['/dashboard']);
+          } else if (error) {
+            throw new Error(error);
+          } else {
+            throw new Error('No authentication code received');
+          }
+        } catch (error) {
+          console.error('Error during auth callback:', error);
+          this.error = error instanceof Error ? error.message : 'Authentication failed';
+          this.authService.logout();
+          setTimeout(() => this.router.navigate(['/login']), 3000);
         }
-      } else if (code) {
-        // If we got the authorization code
-        console.log('Received authorization code');
-        await this.authService.handleGoogleCallback(code);
-        console.log('Code exchange successful');
-        
-        // Double check auth state
-        const isAuth = this.authService.isAuthenticated();
-        console.log('Final auth state check:', isAuth ? 'authenticated' : 'not authenticated');
-        
-        if (isAuth) {
-          console.log('Auth confirmed, navigating to home');
-          await this.router.navigate(['/']);
-        } else {
-          throw new Error('Failed to establish auth state');
-        }
-      } else if (error) {
-        throw new Error(error);
-      } else {
-        throw new Error('No authentication code received');
-      }
+      });
     } catch (error) {
       console.error('Authentication error:', error);
       this.error = error instanceof Error ? error.message : 'Failed to complete authentication. Please try again.';

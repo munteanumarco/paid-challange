@@ -99,17 +99,36 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
+  gap: 16px;
+}
+
+.email-participants {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-sender, .email-receiver {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .email-sender {
   font-weight: 500;
   color: #202124;
-  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.email-receiver {
+  color: #5f6368;
 }
 
 .email-date {
   color: #5f6368;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .email-subject {
