@@ -3,6 +3,22 @@
   padding: 24px;
 }
 
+.sync-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 16px;
+  color: #5f6368;
+  font-size: 14px;
+
+  .info-icon {
+    color: #1a73e8;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .accounts-list {
   display: flex;
   flex-direction: column;
@@ -82,4 +98,17 @@ mat-divider {
   margin: 16px 0;
   border-top-width: 2px;
   border-top-color: #e0e0e0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }

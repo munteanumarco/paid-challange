@@ -7,6 +7,7 @@ from app.api import deps
 from app.models import User, GmailAccount
 from app.schemas.gmail_account import GmailAccount as GmailAccountSchema
 from app.services.gmail import GmailService
+from app.worker import sync_all_accounts
 
 router = APIRouter()
 
@@ -144,4 +145,18 @@ async def sync_gmail_account(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to sync emails: {str(e)}"
+        )
+
+@router.post("/sync-all", status_code=status.HTTP_200_OK)
+async def sync_all_gmail_accounts(
+    current_user: User = Depends(deps.get_current_user)
+):
+    """Trigger a sync of all Gmail accounts"""
+    try:
+        await sync_all_accounts()
+        return {"message": "Successfully triggered sync for all accounts"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to sync all accounts: {str(e)}"
         )

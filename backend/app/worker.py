@@ -30,9 +30,9 @@ async def sync_account(db: Session, account: GmailAccount):
     """Sync a single Gmail account"""
     try:
         # Check if we've synced recently (reduced to 1 minute)
-        if account.last_sync_time and datetime.utcnow() - account.last_sync_time < timedelta(minutes=1):
-            logger.info(f"Skipping sync for {account.email} - too soon since last sync")
-            return
+        # if account.last_sync_time and datetime.utcnow() - account.last_sync_time < timedelta(minutes=1):
+        #     logger.info(f"Skipping sync for {account.email} - too soon since last sync")
+        #     return
 
         logger.info(f"Starting sync for {account.email}")
         gmail_service = GmailService(account, db)

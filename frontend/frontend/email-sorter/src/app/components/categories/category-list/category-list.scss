@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  padding: 24px;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.folder-icon {
+  color: #1a73e8;
+}
+
+.category-details {
+  .category-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #202124;
+    margin-bottom: 4px;
+  }
+
+  .category-description {
+    font-size: 14px;
+    color: #5f6368;
+  }
+}
+
+.category-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5f6368;
+
+  .email-count {
+    font-size: 14px;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.add-category {
+  margin-top: 16px;
+  
+  button {
+    width: 100%;
+    justify-content: center;
+    padding: 8px;
+    border: 1px dashed #dadce0;
+    border-radius: 8px;
+    
+    &:hover {
+      background: #f8f9fa;
+      border-color: #1a73e8;
+    }
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}

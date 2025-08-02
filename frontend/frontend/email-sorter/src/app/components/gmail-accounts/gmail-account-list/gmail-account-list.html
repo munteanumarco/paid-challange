@@ -1,4 +1,8 @@
 <h2 class="section-title">Connected Gmail Accounts</h2>
+<div class="sync-info">
+  <mat-icon class="info-icon">info</mat-icon>
+  Accounts are automatically synced every minute. You can also trigger a manual sync using the sync button.
+</div>
 <mat-card>
   <mat-card-content>
     <div class="accounts-list">
@@ -20,23 +24,24 @@
               </div>
             </div>
           </div>
-          <!-- <div class="account-actions">
-            <button mat-icon-button color="primary" (click)="syncAccount(account)" [disabled]="isSyncing[account.id]">
-              <mat-icon>
-                <mat-spinner diameter="20" *ngIf="isSyncing[account.id]; else syncIcon"></mat-spinner>
-                <ng-template #syncIcon>sync</ng-template>
-              </mat-icon>
-            </button>
-          </div> -->
         </div>
         <mat-divider *ngIf="account.is_primary"></mat-divider>
       </ng-container>
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button color="primary" (click)="connectNewAccount()">
-      <mat-icon>add</mat-icon>
-      Connect Gmail Account
-    </button>
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" (click)="connectNewAccount()">
+        <mat-icon>add</mat-icon>
+        Connect Gmail Account
+      </button>
+      <button mat-raised-button color="accent" (click)="syncAllAccounts()" [disabled]="isSyncingAll || accounts.length === 0">
+        <mat-icon>
+          <mat-spinner diameter="20" *ngIf="isSyncingAll; else syncAllIcon"></mat-spinner>
+          <ng-template #syncAllIcon>sync</ng-template>
+        </mat-icon>
+        Sync All Accounts
+      </button>
+    </div>
   </mat-card-actions>
 </mat-card>

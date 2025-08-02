@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { GmailAccountService, GmailAccount } from '../../../services/gmail-account.service';
+import { RefreshService } from '../../../services/refresh.service';
 
 @Component({
   selector: 'app-gmail-account-list',
@@ -29,6 +30,7 @@ export class GmailAccountListComponent implements OnInit {
   isLoading = true;
   isConnecting = false;
   isSyncing: { [key: number]: boolean } = {};
+  isSyncingAll = false;
 
   get sortedAccounts(): GmailAccount[] {
     return [...this.accounts].sort((a, b) => {
@@ -40,7 +42,8 @@ export class GmailAccountListComponent implements OnInit {
 
   constructor(
     private gmailAccountService: GmailAccountService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private refreshService: RefreshService
   ) {}
 
   ngOnInit() {
@@ -78,13 +81,43 @@ export class GmailAccountListComponent implements OnInit {
     this.gmailAccountService.syncAccount(account.id).subscribe({
       next: () => {
         this.isSyncing[account.id] = false;
-        this.snackBar.open('Gmail account synced successfully', 'Dismiss', { duration: 3000 });
+        this.snackBar.open('Gmail account synced successfully', 'Dismiss', { 
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
         this.loadAccounts(); // Refresh to get updated sync time
+        this.refreshService.triggerCategoriesRefresh(); // Update category email counts
       },
       error: (error) => {
         console.error('Error syncing account:', error);
         this.isSyncing[account.id] = false;
-        this.snackBar.open('Failed to sync Gmail account', 'Dismiss', { duration: 3000 });
+        this.snackBar.open('Failed to sync Gmail account', 'Dismiss', { 
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
+  }
+
+  syncAllAccounts() {
+    this.isSyncingAll = true;
+    this.gmailAccountService.syncAllAccounts().subscribe({
+      next: () => {
+        this.isSyncingAll = false;
+        this.snackBar.open('All Gmail accounts sync triggered successfully', 'Dismiss', { 
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        this.loadAccounts(); // Refresh to get updated sync times
+        this.refreshService.triggerCategoriesRefresh(); // Update category email counts
+      },
+      error: (error) => {
+        console.error('Error syncing all accounts:', error);
+        this.isSyncingAll = false;
+        this.snackBar.open('Failed to sync all Gmail accounts', 'Dismiss', { 
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }

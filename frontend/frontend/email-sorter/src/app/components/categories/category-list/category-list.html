@@ -1,18 +1,22 @@
 <h2 class="section-title">Email Categories</h2>
-<mat-card>
-  <mat-card-content>
-    <mat-list>
-      <mat-list-item *ngFor="let category of categories">
-        <mat-icon matListItemIcon>folder</mat-icon>
-        <div matListItemTitle>{{ category.name }}</div>
-        <div matListItemLine>{{ category.description }}</div>
-      </mat-list-item>
-    </mat-list>
-  </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button color="primary" routerLink="/categories/new">
+
+<div class="categories-list">
+  <div class="category-item" *ngFor="let category of categories" [routerLink]="['/categories', category.id, 'emails']">
+    <div class="category-info">
+      <mat-icon class="folder-icon">folder</mat-icon>
+      <div class="category-details">
+        <div class="category-name">{{ category.name }}</div>
+        <div class="category-description">{{ category.description }}</div>
+      </div>
+    </div>
+    <div class="category-actions">
+    </div>
+  </div>
+
+  <div class="add-category">
+    <button mat-button color="primary" routerLink="/categories/new">
       <mat-icon>add</mat-icon>
       Add New Category
     </button>
-  </mat-card-actions>
-</mat-card>
+  </div>
+</div>

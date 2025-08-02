@@ -28,7 +28,7 @@ import { Email } from '../../../services/email';
           <strong>From:</strong> {{ data.sender }}
         </div>
         <div class="email-to" *ngIf="data.gmail_account?.email">
-          <strong>To:</strong> {{ data.gmail_account.email }}
+          <strong>To:</strong> {{ data.gmail_account?.email }}
         </div>
         <div class="email-date">
           <strong>Received:</strong> {{ data.received_at | date:'medium' }}

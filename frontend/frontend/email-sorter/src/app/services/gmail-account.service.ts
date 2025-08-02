@@ -44,4 +44,8 @@ export class GmailAccountService {
   syncAccount(id: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/gmail-accounts/${id}/sync`, {});
   }
+
+  syncAllAccounts(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/gmail-accounts/sync-all`, {});
+  }
 }
