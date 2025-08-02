@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EmailService, Email } from '../../../services/email';
 import { CategoryService, Category } from '../../../services/category';
 import { EmailViewDialogComponent } from '../../emails/email-view-dialog/email-view-dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-category-emails',
@@ -96,16 +97,38 @@ export class CategoryEmailsComponent implements OnInit {
   deleteSelectedEmails() {
     if (this.selectedEmails.size === 0) return;
 
-    const emailIds = Array.from(this.selectedEmails);
-    this.emailService.bulkDeleteEmails(emailIds).subscribe({
-      next: () => {
-        this.snackBar.open('Emails deleted successfully', 'Dismiss', { duration: 3000 });
-        this.selectedEmails.clear();
-        this.loadEmails(this.category!.id);
-      },
-      error: (error) => {
-        console.error('Error deleting emails:', error);
-        this.snackBar.open('Failed to delete emails', 'Dismiss', { duration: 3000 });
+    const emailCount = this.selectedEmails.size;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Confirm Deletion',
+        message: `Are you sure you want to delete ${emailCount} ${emailCount === 1 ? 'email' : 'emails'}? This action cannot be undone.`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        const emailIds = Array.from(this.selectedEmails);
+        this.emailService.bulkDeleteEmails(emailIds).subscribe({
+          next: () => {
+            this.snackBar.open('Emails deleted successfully', '', { 
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'bottom',
+              panelClass: ['success-snackbar']
+            });
+            this.selectedEmails.clear();
+            this.loadEmails(this.category!.id);
+          },
+          error: (error) => {
+            console.error('Error deleting emails:', error);
+            this.snackBar.open('Failed to delete emails', '', { 
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'bottom',
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
       }
     });
   }

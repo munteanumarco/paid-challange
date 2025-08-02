@@ -1,6 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 
+// Reset default styles
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+// Common styles
 .section-title {
   color: #1976d2;
   font-size: 20px;
@@ -8,6 +23,70 @@
   margin: 0 0 24px 0;
 }
 
+// Form styles
+input, textarea, button {
+  font-family: inherit;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: inherit;
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+// Snackbar styles
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #2e7d32 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+
+    .mat-mdc-button {
+      color: #ffffff !important;
+    }
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #d32f2f !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+
+    .mat-mdc-button {
+      color: #ffffff !important;
+    }
+  }
+
+  .mdc-snackbar__surface {
+    background-color: var(--mdc-snackbar-container-color) !important;
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px 0 rgba(0,0,0,.14),0 1px 18px 0 rgba(0,0,0,.12) !important;
+  }
+
+  .mdc-snackbar__label {
+    color: var(--mdc-snackbar-supporting-text-color) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
+
+  .mat-mdc-snack-bar-actions {
+    padding-inline-start: 0 !important;
+  }
+
+  .mat-mdc-button {
+    min-width: auto !important;
+    padding: 0 8px !important;
+    font-weight: 500 !important;
+    background: none !important;
+
+    &:hover {
+      background: none !important;
+    }
+  }
+}
+
+// Tooltip styles
 .account-tooltip {
   background: white !important;
   color: #202124 !important;

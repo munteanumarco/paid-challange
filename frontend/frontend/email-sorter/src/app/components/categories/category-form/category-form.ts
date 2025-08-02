@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, ActivatedRoute } from '@angular/router';
 import { CategoryService, Category } from '../../../services/category';
 
 @Component({
@@ -16,11 +11,7 @@ import { CategoryService, Category } from '../../../services/category';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatCardModule
+    RouterModule
   ],
   templateUrl: './category-form.html',
   styleUrls: ['./category-form.scss']
@@ -28,6 +19,7 @@ import { CategoryService, Category } from '../../../services/category';
 export class CategoryFormComponent implements OnInit {
   categoryForm: FormGroup;
   isEditing = false;
+  isSubmitting = false;
   categoryId?: number;
 
   constructor(
@@ -68,7 +60,8 @@ export class CategoryFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.categoryForm.valid) {
+    if (this.categoryForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const categoryData = this.categoryForm.value;
       
       const request = this.isEditing && this.categoryId
@@ -78,12 +71,25 @@ export class CategoryFormComponent implements OnInit {
       request.subscribe({
         next: () => {
           const message = this.isEditing ? 'Category updated successfully' : 'Category created successfully';
-          this.snackBar.open(message, 'Dismiss', { duration: 3000 });
-          this.router.navigate(['/categories']);
+          this.snackBar.open(message, '', { 
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'bottom',
+            panelClass: ['success-snackbar']
+          });
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           console.error('Error saving category:', error);
-          this.snackBar.open('Failed to save category', 'Dismiss', { duration: 3000 });
+          this.snackBar.open('Failed to save category', '', { 
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'bottom',
+            panelClass: ['error-snackbar']
+          });
+        },
+        complete: () => {
+          this.isSubmitting = false;
         }
       });
     }

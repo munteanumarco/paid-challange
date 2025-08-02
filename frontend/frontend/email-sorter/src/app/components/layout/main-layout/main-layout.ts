@@ -17,22 +17,7 @@ import { AuthService } from '../../../services/auth';
     MatButtonModule,
     MatIconModule
   ],
-  template: `
-    <div class="layout-container">
-      <mat-toolbar color="primary">
-        <span>Email Sorter</span>
-        <span class="toolbar-spacer"></span>
-        <button mat-button (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          Logout
-        </button>
-      </mat-toolbar>
-
-      <div class="main-content">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-  `,
+  templateUrl: './main-layout.html',
   styles: [`
     .layout-container {
       min-height: 100vh;
@@ -52,6 +37,21 @@ import { AuthService } from '../../../services/auth';
         z-index: 2;
         background-color: #1a73e8;
         color: white;
+
+        .app-title {
+          color: white;
+          text-decoration: none;
+          font-size: 20px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: opacity 0.2s;
+
+          &:hover {
+            opacity: 0.9;
+          }
+        }
       }
 
       .main-content {

@@ -45,7 +45,15 @@ export class CallbackComponent implements OnInit {
       const params = await this.route.queryParams.toPromise();
       console.log('Query params:', params);
       
-      if (params['access_token']) {
+      if (!params) {
+        throw new Error('No query parameters received');
+      }
+
+      const accessToken = params['access_token'];
+      const code = params['code'];
+      const error = params['error'];
+      
+      if (accessToken) {
         // If we got the token directly from the backend redirect
         console.log('Received access token from backend redirect');
         await this.authService.handleDirectCallback(params);
@@ -61,10 +69,10 @@ export class CallbackComponent implements OnInit {
         } else {
           throw new Error('Failed to establish auth state');
         }
-      } else if (params['code']) {
+      } else if (code) {
         // If we got the authorization code
         console.log('Received authorization code');
-        await this.authService.handleGoogleCallback(params['code']);
+        await this.authService.handleGoogleCallback(code);
         console.log('Code exchange successful');
         
         // Double check auth state
@@ -77,8 +85,8 @@ export class CallbackComponent implements OnInit {
         } else {
           throw new Error('Failed to establish auth state');
         }
-      } else if (params['error']) {
-        throw new Error(params['error']);
+      } else if (error) {
+        throw new Error(error);
       } else {
         throw new Error('No authentication code received');
       }
