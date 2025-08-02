@@ -1,0 +1,27 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Email Categories</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let category of categories">
+        <mat-icon matListItemIcon>folder</mat-icon>
+        <div matListItemTitle>{{ category.name }}</div>
+        <div matListItemLine>{{ category.description }}</div>
+        <div matListItemMeta>{{ category.email_count }} emails</div>
+        <button mat-icon-button [routerLink]="['/categories', category.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteCategory(category.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" routerLink="/categories/new">
+      <mat-icon>add</mat-icon>
+      Add New Category
+    </button>
+  </mat-card-actions>
+</mat-card>

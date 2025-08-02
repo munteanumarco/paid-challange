@@ -1,0 +1,25 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Connected Gmail Accounts</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let account of accounts">
+        <mat-icon matListItemIcon>mail</mat-icon>
+        <div matListItemTitle>{{ account.email }}</div>
+        <div matListItemLine *ngIf="account.last_sync_time">
+          Last synced: {{ account.last_sync_time | date:'medium' }}
+        </div>
+        <button mat-icon-button color="warn" (click)="removeAccount(account.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="addAccount()">
+      <mat-icon>add</mat-icon>
+      Connect Gmail Account
+    </button>
+  </mat-card-actions>
+</mat-card>

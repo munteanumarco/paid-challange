@@ -1,0 +1,46 @@
+<div class="add-account-container">
+  <mat-card class="add-account-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>mail</mat-icon>
+        Connect Gmail Account
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="welcome-message">
+        <h2>Welcome to Email Sorter!</h2>
+        <p>To get started, you'll need to connect at least one Gmail account.</p>
+      </div>
+
+      <div class="features-list">
+        <h3>What you'll get:</h3>
+        <ul>
+          <li>
+            <mat-icon>auto_awesome</mat-icon>
+            AI-powered email categorization
+          </li>
+          <li>
+            <mat-icon>description</mat-icon>
+            Smart email summaries
+          </li>
+          <li>
+            <mat-icon>archive</mat-icon>
+            Automatic email archiving
+          </li>
+          <li>
+            <mat-icon>unsubscribe</mat-icon>
+            Easy unsubscribe management
+          </li>
+        </ul>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="addAccount()">
+        <img src="assets/google-logo.svg" alt="Google" class="google-logo">
+        Connect Gmail Account
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

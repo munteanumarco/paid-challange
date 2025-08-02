@@ -1,0 +1,23 @@
+<div class="login-container">
+  <div class="login-content">
+    <div class="app-logo">
+      <mat-icon>mail</mat-icon>
+      <h1>Email Sorter</h1>
+    </div>
+
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="login()" 
+      [disabled]="isLoading"
+      class="login-button">
+      <img src="assets/google-logo.svg" alt="Google" class="google-logo" *ngIf="!isLoading">
+      <mat-icon *ngIf="isLoading">sync</mat-icon>
+      {{ isLoading ? 'Signing in...' : 'Sign in with Google' }}
+    </button>
+
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+  </div>
+</div>
