@@ -38,48 +38,58 @@ export class CallbackComponent implements OnInit {
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log('Callback component initialized');
-    this.route.queryParams.subscribe(params => {
+    
+    try {
+      const params = await this.route.queryParams.toPromise();
       console.log('Query params:', params);
       
       if (params['access_token']) {
         // If we got the token directly from the backend redirect
         console.log('Received access token from backend redirect');
-        this.authService.handleDirectCallback(params).subscribe({
-          next: () => {
-            console.log('Direct callback handled successfully');
-            this.router.navigate(['/']);
-          },
-          error: (error) => {
-            console.error('Direct callback error:', error);
-            this.error = 'Failed to complete authentication. Please try again.';
-            setTimeout(() => this.router.navigate(['/login']), 3000);
-          }
-        });
+        await this.authService.handleDirectCallback(params);
+        console.log('Direct callback handled successfully');
+        
+        // Double check auth state
+        const isAuth = this.authService.isAuthenticated();
+        console.log('Final auth state check:', isAuth ? 'authenticated' : 'not authenticated');
+        
+        if (isAuth) {
+          console.log('Auth confirmed, navigating to home');
+          await this.router.navigate(['/']);
+        } else {
+          throw new Error('Failed to establish auth state');
+        }
       } else if (params['code']) {
         // If we got the authorization code
         console.log('Received authorization code');
-        this.authService.handleGoogleCallback(params['code']).subscribe({
-          next: () => {
-            console.log('Code exchange successful');
-            this.router.navigate(['/']);
-          },
-          error: (error) => {
-            console.error('Authentication error:', error);
-            this.error = 'Failed to complete authentication. Please try again.';
-            setTimeout(() => this.router.navigate(['/login']), 3000);
-          }
-        });
+        await this.authService.handleGoogleCallback(params['code']);
+        console.log('Code exchange successful');
+        
+        // Double check auth state
+        const isAuth = this.authService.isAuthenticated();
+        console.log('Final auth state check:', isAuth ? 'authenticated' : 'not authenticated');
+        
+        if (isAuth) {
+          console.log('Auth confirmed, navigating to home');
+          await this.router.navigate(['/']);
+        } else {
+          throw new Error('Failed to establish auth state');
+        }
       } else if (params['error']) {
-        console.error('Received error:', params['error']);
-        this.error = params['error'];
-        setTimeout(() => this.router.navigate(['/login']), 3000);
+        throw new Error(params['error']);
       } else {
-        console.error('No code or token received');
-        this.error = 'No authentication code received';
-        setTimeout(() => this.router.navigate(['/login']), 3000);
+        throw new Error('No authentication code received');
       }
-    });
+    } catch (error) {
+      console.error('Authentication error:', error);
+      this.error = error instanceof Error ? error.message : 'Failed to complete authentication. Please try again.';
+      
+      // Clear any partial auth state
+      this.authService.logout();
+      
+      setTimeout(() => this.router.navigate(['/login']), 3000);
+    }
   }
 }

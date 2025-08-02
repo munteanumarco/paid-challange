@@ -10,10 +10,11 @@
 }
 
 .account-item {
-  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
   padding: 16px;
-  border-radius: 8px;
   border: 1px solid #e0e0e0;
+  border-radius: 8px;
   transition: all 0.2s ease;
 
   &.primary-account {
@@ -23,14 +24,10 @@
     .primary-icon {
       color: #1a73e8;
     }
-
-    .account-title {
-      font-weight: 500;
-    }
   }
 
   &:hover {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -38,53 +35,51 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  flex: 1;
 }
 
 .account-info {
   flex: 1;
+  min-width: 0;
 }
 
 .account-title {
-  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
+  margin-bottom: 4px;
 }
 
 .primary-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   background: #1a73e8;
   color: white;
   padding: 4px 12px;
   border-radius: 16px;
   font-size: 12px;
+  margin-left: 12px;
   font-weight: 500;
+  position: relative;
+  cursor: help;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+  }
 }
 
 .account-sync {
   font-size: 14px;
   color: #5f6368;
-  margin-top: 4px;
-}
-
-.account-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  justify-content: flex-end;
 }
 
 mat-divider {
-  margin: 24px 0;
+  margin: 16px 0;
   border-top-width: 2px;
   border-top-color: #e0e0e0;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 32px;
-  color: #5f6368;
 }

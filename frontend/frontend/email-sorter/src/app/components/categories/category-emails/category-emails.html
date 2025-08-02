@@ -1,18 +1,27 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>{{ category?.name }}</mat-card-title>
-    <mat-card-subtitle>{{ category?.description }}</mat-card-subtitle>
-  </mat-card-header>
+<div class="category-header">
+  <div class="category-info">
+    <h1>{{ category?.name }}</h1>
+    <p class="category-description">{{ category?.description }}</p>
+  </div>
+</div>
 
+<mat-card>
   <mat-card-content>
     <div *ngIf="!isLoading; else loading">
       <div class="actions-bar" *ngIf="emails.length > 0">
-        <button mat-button (click)="selectAllEmails()">
-          {{ selectedEmails.size === emails.length ? 'Deselect All' : 'Select All' }}
-        </button>
-        <button mat-raised-button color="warn" [disabled]="selectedEmails.size === 0" (click)="deleteSelectedEmails()">
-          Delete Selected
-        </button>
+        <div class="action-buttons">
+          <button mat-stroked-button (click)="selectAllEmails()">
+            <mat-icon>{{ selectedEmails.size === emails.length ? 'deselect_all' : 'select_all' }}</mat-icon>
+            {{ selectedEmails.size === emails.length ? 'Deselect All' : 'Select All' }}
+          </button>
+          <button mat-raised-button color="warn" [disabled]="selectedEmails.size === 0" (click)="deleteSelectedEmails()">
+            <mat-icon>delete</mat-icon>
+            Delete Selected ({{ selectedEmails.size }})
+          </button>
+        </div>
+        <div class="email-count">
+          {{ emails.length }} {{ emails.length === 1 ? 'email' : 'emails' }}
+        </div>
       </div>
 
       <div class="email-list">

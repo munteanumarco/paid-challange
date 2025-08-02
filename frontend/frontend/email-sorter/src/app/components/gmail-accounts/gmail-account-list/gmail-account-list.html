@@ -1,7 +1,5 @@
+<h2 class="section-title">Connected Gmail Accounts</h2>
 <mat-card>
-  <mat-card-header>
-    <mat-card-title>Connected Gmail Accounts</mat-card-title>
-  </mat-card-header>
   <mat-card-content>
     <div class="accounts-list">
       <ng-container *ngFor="let account of sortedAccounts">
@@ -13,7 +11,7 @@
             <div class="account-info">
               <div class="account-title">
                 {{ account.email }}
-                <span *ngIf="account.is_primary" class="primary-badge" matTooltip="This is the account you first logged in with. Use this account to log in to the application.">
+                <span *ngIf="account.is_primary" class="primary-badge" [matTooltip]="'This is the account you first logged in with.\nUse this account to log in to the application.'" [matTooltipPosition]="'right'" matTooltipClass="account-tooltip">
                   Primary Account
                 </span>
               </div>

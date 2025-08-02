@@ -11,7 +11,7 @@
       (click)="login()" 
       [disabled]="isLoading"
       class="login-button">
-      <img src="assets/google-logo.svg" alt="Google" class="google-logo" *ngIf="!isLoading">
+      <img src="/google-logo.png" alt="Google" class="google-logo" *ngIf="!isLoading">
       <mat-icon *ngIf="isLoading">sync</mat-icon>
       {{ isLoading ? 'Signing in...' : 'Sign in with Google' }}
     </button>

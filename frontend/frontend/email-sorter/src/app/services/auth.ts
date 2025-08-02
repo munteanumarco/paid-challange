@@ -32,12 +32,19 @@ export class AuthService {
   }
 
   private loadStoredAuth(): void {
+    console.log('Loading stored auth state...');
     const user = localStorage.getItem('currentUser');
     const token = localStorage.getItem('accessToken');
     
+    console.log('Stored user:', user);
+    console.log('Stored token:', token ? 'exists' : 'none');
+    
     if (user && token) {
+      console.log('Found stored credentials, restoring auth state');
       this.currentUserSubject.next(JSON.parse(user));
       this.accessTokenSubject.next(token);
+    } else {
+      console.log('No stored credentials found');
     }
   }
 
@@ -78,20 +85,24 @@ export class AuthService {
     }
   }
 
-  handleGoogleCallback(code: string, state: string = 'login'): Observable<AuthResponse> {
+  async handleGoogleCallback(code: string, state: string = 'login'): Promise<AuthResponse> {
     console.log('Handling Google callback with code');
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/exchange-code`, { code, state }).pipe(
-      tap(response => {
-        console.log('Received auth response:', response);
-        // Only update auth state for login flow, not for connect flow
-        if (!state.startsWith('connect_')) {
-          this.handleAuthResponse(response);
-        }
-      })
-    );
+    const response = await this.http.post<AuthResponse>(`${this.apiUrl}/auth/exchange-code`, { code, state }).toPromise();
+    
+    if (!response) {
+      throw new Error('No response from server');
+    }
+
+    console.log('Received auth response:', response);
+    // Only update auth state for login flow, not for connect flow
+    if (!state.startsWith('connect_')) {
+      await this.handleAuthResponse(response);
+    }
+    
+    return response;
   }
 
-  handleDirectCallback(params: any): Observable<AuthResponse> {
+  async handleDirectCallback(params: any): Promise<AuthResponse> {
     console.log('Handling direct callback with params:', params);
     const response: AuthResponse = {
       access_token: params.access_token,
@@ -100,42 +111,67 @@ export class AuthService {
       message: params.message
     };
 
-    return new Observable(observer => {
-      try {
-        // Only update auth state if this is not a connect flow
-        if (!params.message?.includes('connected')) {
-          this.handleAuthResponse(response);
-        }
-        observer.next(response);
-        observer.complete();
-      } catch (error) {
-        observer.error(error);
+    // Only update auth state if this is not a connect flow
+    if (!params.message?.includes('connected')) {
+      await this.handleAuthResponse(response);
+      
+      // Verify auth state
+      const isAuth = this.isAuthenticated();
+      console.log('Auth state after direct callback:', isAuth ? 'authenticated' : 'not authenticated');
+      
+      if (!isAuth) {
+        throw new Error('Failed to establish auth state after callback');
       }
-    });
+    }
+    
+    return response;
   }
 
-  private handleAuthResponse(response: AuthResponse): void {
+  private async handleAuthResponse(response: AuthResponse): Promise<void> {
     console.log('Handling auth response');
+    
+    // Clear any existing auth state
+    this.logout();
+    
+    // Set the new token
     localStorage.setItem('accessToken', response.access_token);
     this.accessTokenSubject.next(response.access_token);
-    this.fetchCurrentUser();
+    
+    try {
+      // Fetch user data
+      const user = await this.http.get<User>(`${this.apiUrl}/auth/me`).toPromise();
+      
+      if (!user) {
+        throw new Error('No user data received');
+      }
+      
+      console.log('Received user info:', user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+      
+      // Verify auth state
+      const isAuth = this.isAuthenticated();
+      console.log('Auth state after user fetch:', isAuth ? 'authenticated' : 'not authenticated');
+      
+      if (!isAuth) {
+        throw new Error('Auth state not established after user fetch');
+      }
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      this.logout();
+      throw error;
+    }
   }
 
-  private fetchCurrentUser(): void {
+  fetchCurrentUser(): Observable<User> {
     console.log('Fetching current user');
-    if (this.accessTokenSubject.value) {
-      this.http.get<User>(`${this.apiUrl}/auth/me`).subscribe({
-        next: (user) => {
-          console.log('Received user info:', user);
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        },
-        error: (error) => {
-          console.error('Failed to fetch user info:', error);
-          this.logout();
-        }
-      });
-    }
+    return this.http.get<User>(`${this.apiUrl}/auth/me`).pipe(
+      tap(user => {
+        console.log('Received user info:', user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+      })
+    );
   }
 
   logout(): void {
@@ -148,9 +184,10 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    const isAuth = !!this.currentUserSubject.value && !!this.accessTokenSubject.value;
-    console.log('Checking authentication:', isAuth);
-    return isAuth;
+    const hasUser = !!this.currentUserSubject.value;
+    const hasToken = !!this.accessTokenSubject.value;
+    console.log('Auth check - User:', hasUser, 'Token:', hasToken);
+    return hasUser && hasToken;
   }
 
   getAccessToken(): string | null {
