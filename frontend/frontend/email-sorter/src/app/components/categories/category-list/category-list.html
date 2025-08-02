@@ -8,13 +8,6 @@
         <mat-icon matListItemIcon>folder</mat-icon>
         <div matListItemTitle>{{ category.name }}</div>
         <div matListItemLine>{{ category.description }}</div>
-        <div matListItemMeta>{{ category.email_count }} emails</div>
-        <button mat-icon-button [routerLink]="['/categories', category.id, 'edit']">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteCategory(category.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
       </mat-list-item>
     </mat-list>
   </mat-card-content>

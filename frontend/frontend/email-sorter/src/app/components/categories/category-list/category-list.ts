@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
-import { CategoryService } from '../../../services/category';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { CategoryService, Category } from '../../../services/category';
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
@@ -22,7 +26,7 @@ import { CategoryService } from '../../../services/category';
     </div>
 
     <div class="category-list">
-      <div class="category-item" *ngFor="let category of categories">
+      <div class="category-item" *ngFor="let category of categories" (click)="viewCategoryEmails(category.id)">
         <div class="category-info">
           <mat-icon class="category-icon">folder</mat-icon>
           <div class="category-details">
@@ -30,16 +34,9 @@ import { CategoryService } from '../../../services/category';
             <div class="category-description">{{ category.description }}</div>
           </div>
         </div>
-        <div class="category-actions">
-          <mat-chip-set>
-            <mat-chip>{{ category.email_count }} emails</mat-chip>
-          </mat-chip-set>
-          <button mat-icon-button color="primary" (click)="editCategory(category.id)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteCategory(category.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
+        <div class="category-meta">
+          <mat-chip>{{ category.email_count }} emails</mat-chip>
+          <mat-icon>chevron_right</mat-icon>
         </div>
       </div>
 
@@ -147,36 +144,36 @@ import { CategoryService } from '../../../services/category';
   `]
 })
 export class CategoryListComponent implements OnInit {
-  categories: any[] = [
-    {
-      id: 1,
-      name: 'Newsletters',
-      description: 'Regular newsletters and updates from subscribed services',
-      email_count: 25
-    },
-    {
-      id: 2,
-      name: 'Shopping',
-      description: 'Order confirmations and shipping updates',
-      email_count: 12
-    }
-  ];
+  categories: Category[] = [];
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(
+    private categoryService: CategoryService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    // TODO: Load categories from service
+    this.loadCategories();
+  }
+
+  private loadCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.snackBar.open('Failed to load categories', 'Dismiss', { duration: 3000 });
+      }
+    });
   }
 
   addCategory() {
-    // TODO: Implement add category
+    this.router.navigate(['/categories/new']);
   }
 
-  editCategory(id: number) {
-    // TODO: Implement edit category
-  }
-
-  deleteCategory(id: number) {
-    // TODO: Implement delete category
+  viewCategoryEmails(categoryId: number) {
+    this.router.navigate(['/categories', categoryId, 'emails']);
   }
 }

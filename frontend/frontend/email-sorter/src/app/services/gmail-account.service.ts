@@ -8,6 +8,7 @@ export interface GmailAccount {
   google_id: string;
   last_sync_time: string;
   is_active: boolean;
+  is_primary: boolean;  // Added this field
 }
 
 @Injectable({
@@ -38,10 +39,6 @@ export class GmailAccountService {
       console.error('Failed to get auth URL:', error);
       throw error;
     }
-  }
-
-  removeAccount(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/gmail-accounts/${id}`);
   }
 
   syncAccount(id: number): Observable<void> {

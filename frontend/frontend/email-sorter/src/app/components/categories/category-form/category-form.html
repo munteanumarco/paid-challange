@@ -1,1 +1,39 @@
-<p>category-form works!</p>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ isEditing ? 'Edit' : 'Add' }} Category</mat-card-title>
+  </mat-card-header>
+
+  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Category Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g., Newsletters">
+        <mat-error *ngIf="categoryForm.get('name')?.errors?.['required']">
+          Name is required
+        </mat-error>
+        <mat-error *ngIf="categoryForm.get('name')?.errors?.['minlength']">
+          Name must be at least 3 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="4"
+          placeholder="Describe how emails should be sorted into this category..."></textarea>
+        <mat-error *ngIf="categoryForm.get('description')?.errors?.['required']">
+          Description is required
+        </mat-error>
+        <mat-error *ngIf="categoryForm.get('description')?.errors?.['minlength']">
+          Description must be at least 10 characters
+        </mat-error>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button type="button" routerLink="/categories">Cancel</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="categoryForm.invalid">
+        {{ isEditing ? 'Update' : 'Create' }} Category
+      </button>
+    </mat-card-actions>
+  </form>
+</mat-card>

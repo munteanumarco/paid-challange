@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
 import { GmailAccountService, GmailAccount } from '../../../services/gmail-account.service';
 
 @Component({
@@ -15,135 +17,26 @@ import { GmailAccountService, GmailAccount } from '../../../services/gmail-accou
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatCardModule
   ],
-  template: `
-    <div class="section-header">
-      <h2>Connected Gmail Accounts</h2>
-    </div>
-
-    <div class="account-list" *ngIf="!isLoading; else loading">
-      <div class="account-item" *ngFor="let account of accounts">
-        <div class="account-info">
-          <mat-icon class="account-icon">mail</mat-icon>
-          <div class="account-details">
-            <div class="account-email">{{ account.email }}</div>
-            <div class="account-sync">Last synced: {{ account.last_sync_time | date:'medium' }}</div>
-          </div>
-        </div>
-        <div class="account-actions">
-          <button mat-icon-button color="primary" (click)="syncAccount(account)" [disabled]="isSyncing[account.id]">
-            <mat-icon>
-              <mat-spinner diameter="20" *ngIf="isSyncing[account.id]; else syncIcon"></mat-spinner>
-              <ng-template #syncIcon>sync</ng-template>
-            </mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <button mat-button color="primary" (click)="connectNewAccount()" [disabled]="isConnecting" class="add-account-button">
-        <mat-icon>add</mat-icon>
-        Connect Gmail Account
-      </button>
-    </div>
-
-    <ng-template #loading>
-      <div class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p>Loading accounts...</p>
-      </div>
-    </ng-template>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      padding: 24px;
-    }
-
-    .section-header {
-      margin-bottom: 24px;
-
-      h2 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 500;
-        color: #1a73e8;
-      }
-    }
-
-    .account-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .account-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      transition: background-color 0.2s;
-
-      &:hover {
-        background: #f1f3f4;
-      }
-    }
-
-    .account-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .account-icon {
-      color: #1a73e8;
-    }
-
-    .account-details {
-      .account-email {
-        font-weight: 500;
-        color: #202124;
-      }
-
-      .account-sync {
-        font-size: 12px;
-        color: #5f6368;
-        margin-top: 4px;
-      }
-    }
-
-    .account-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .add-account-button {
-      margin-top: 8px;
-      color: #1a73e8;
-      font-weight: 500;
-
-      mat-icon {
-        margin-right: 8px;
-      }
-    }
-
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 32px;
-      color: #5f6368;
-    }
-  `]
+  templateUrl: './gmail-account-list.html',
+  styleUrls: ['./gmail-account-list.scss']
 })
 export class GmailAccountListComponent implements OnInit {
   accounts: GmailAccount[] = [];
   isLoading = true;
   isConnecting = false;
   isSyncing: { [key: number]: boolean } = {};
+
+  get sortedAccounts(): GmailAccount[] {
+    return [...this.accounts].sort((a, b) => {
+      if (a.is_primary) return -1;
+      if (b.is_primary) return 1;
+      return 0;
+    });
+  }
 
   constructor(
     private gmailAccountService: GmailAccountService,

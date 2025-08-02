@@ -161,16 +161,19 @@ async def handle_oauth_callback(
             settings.GOOGLE_CLIENT_ID
         )
 
-        # Find or create user based on the primary email
-        user = db.query(User).filter(User.email == id_info["email"]).first()
-        if not user:
-            # Only create new user if this is a first-time login
-            if state == "login":
+        # Handle user lookup/creation based on flow type
+        if state.startswith("connect_"):
+            # For connect flow, use the user ID from state
+            if not current_user:
+                raise ValueError("User not found for connect flow")
+            user = current_user
+        else:
+            # For login flow, find or create user based on email
+            user = db.query(User).filter(User.email == id_info["email"]).first()
+            if not user:
                 user = User(email=id_info["email"])
                 db.add(user)
                 db.commit()
-            else:
-                raise ValueError("User not found")
         
         # Check if this Gmail account is already connected
         existing_account = db.query(GmailAccount).filter(
@@ -196,6 +199,9 @@ async def handle_oauth_callback(
                 # If another user has connected this Gmail account, return error
                 raise ValueError("This Gmail account is already connected to another user")
 
+        # Check if this is the first Gmail account for the user
+        is_first_account = not db.query(GmailAccount).filter(GmailAccount.user_id == user.id).first()
+
         # Create new Gmail account connection
         gmail_account = GmailAccount(
             email=id_info["email"],
@@ -203,7 +209,8 @@ async def handle_oauth_callback(
             access_token=client.token["access_token"],
             refresh_token=client.token.get("refresh_token"),
             token_expiry=datetime.utcnow() + timedelta(seconds=int(client.token["expires_in"])),
-            user_id=user.id
+            user_id=user.id,
+            is_primary=is_first_account  # Set is_primary=True for the first account
         )
         
         db.add(gmail_account)

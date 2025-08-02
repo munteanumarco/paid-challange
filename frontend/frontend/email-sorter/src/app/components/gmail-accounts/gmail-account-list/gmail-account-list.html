@@ -3,21 +3,40 @@
     <mat-card-title>Connected Gmail Accounts</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <mat-list>
-      <mat-list-item *ngFor="let account of accounts">
-        <mat-icon matListItemIcon>mail</mat-icon>
-        <div matListItemTitle>{{ account.email }}</div>
-        <div matListItemLine *ngIf="account.last_sync_time">
-          Last synced: {{ account.last_sync_time | date:'medium' }}
+    <div class="accounts-list">
+      <ng-container *ngFor="let account of sortedAccounts">
+        <div class="account-item" [class.primary-account]="account.is_primary">
+          <div class="account-header">
+            <mat-icon [class.primary-icon]="account.is_primary">
+              {{ account.is_primary ? 'verified_user' : 'mail' }}
+            </mat-icon>
+            <div class="account-info">
+              <div class="account-title">
+                {{ account.email }}
+                <span *ngIf="account.is_primary" class="primary-badge" matTooltip="This is the account you first logged in with. Use this account to log in to the application.">
+                  Primary Account
+                </span>
+              </div>
+              <div class="account-sync" *ngIf="account.last_sync_time">
+                Last synced: {{ account.last_sync_time | date:'medium' }} UTC
+              </div>
+            </div>
+          </div>
+          <!-- <div class="account-actions">
+            <button mat-icon-button color="primary" (click)="syncAccount(account)" [disabled]="isSyncing[account.id]">
+              <mat-icon>
+                <mat-spinner diameter="20" *ngIf="isSyncing[account.id]; else syncIcon"></mat-spinner>
+                <ng-template #syncIcon>sync</ng-template>
+              </mat-icon>
+            </button>
+          </div> -->
         </div>
-        <button mat-icon-button color="warn" (click)="removeAccount(account.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-list-item>
-    </mat-list>
+        <mat-divider *ngIf="account.is_primary"></mat-divider>
+      </ng-container>
+    </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button color="primary" (click)="addAccount()">
+    <button mat-raised-button color="primary" (click)="connectNewAccount()">
       <mat-icon>add</mat-icon>
       Connect Gmail Account
     </button>

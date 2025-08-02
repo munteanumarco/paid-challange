@@ -11,6 +11,7 @@ class GmailAccountCreate(GmailAccountBase):
 class GmailAccount(GmailAccountBase):
     id: int
     google_id: str
+    is_primary: bool
     last_sync_time: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime

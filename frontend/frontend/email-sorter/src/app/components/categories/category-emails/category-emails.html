@@ -1,0 +1,49 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ category?.name }}</mat-card-title>
+    <mat-card-subtitle>{{ category?.description }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div *ngIf="!isLoading; else loading">
+      <div class="actions-bar" *ngIf="emails.length > 0">
+        <button mat-button (click)="selectAllEmails()">
+          {{ selectedEmails.size === emails.length ? 'Deselect All' : 'Select All' }}
+        </button>
+        <button mat-raised-button color="warn" [disabled]="selectedEmails.size === 0" (click)="deleteSelectedEmails()">
+          Delete Selected
+        </button>
+      </div>
+
+      <div class="email-list">
+        <div class="email-item" *ngFor="let email of emails">
+          <div class="email-checkbox">
+            <mat-checkbox
+              [checked]="selectedEmails.has(email.id)"
+              (change)="toggleEmailSelection(email.id)"
+            ></mat-checkbox>
+          </div>
+          <div class="email-content" (click)="viewEmail(email, $event)">
+            <div class="email-header">
+              <div class="email-sender">{{ email.sender }}</div>
+              <div class="email-date">{{ email.received_at | date:'medium' }}</div>
+            </div>
+            <div class="email-subject">{{ email.subject }}</div>
+            <div class="email-summary" *ngIf="email.summary">{{ email.summary }}</div>
+          </div>
+        </div>
+
+        <div class="no-emails" *ngIf="emails.length === 0">
+          No emails in this category yet.
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading emails...</p>
+  </div>
+</ng-template>

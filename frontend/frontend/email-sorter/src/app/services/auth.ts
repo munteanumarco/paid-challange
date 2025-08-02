@@ -13,6 +13,7 @@ export interface AuthResponse {
   access_token: string;
   token_type: string;
   gmail_account_id: number;
+  message?: string;  // For connect account response
 }
 
 @Injectable({
@@ -27,7 +28,10 @@ export class AuthService {
   public accessToken$ = this.accessTokenSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Load saved auth state
+    this.loadStoredAuth();
+  }
+
+  private loadStoredAuth(): void {
     const user = localStorage.getItem('currentUser');
     const token = localStorage.getItem('accessToken');
     
@@ -40,14 +44,11 @@ export class AuthService {
   async initiateGoogleLogin(): Promise<void> {
     try {
       console.log('Initiating Google login');
-      // First get the auth URL from our backend
       const response = await this.http.get<{url: string}>(`${this.apiUrl}/auth/google-auth-url`).toPromise();
       console.log('Received auth URL:', response);
       
       if (response?.url) {
-        // Store current URL to return to after login
         localStorage.setItem('returnUrl', window.location.pathname);
-        // Redirect to Google's auth page
         window.location.href = response.url;
       } else {
         throw new Error('No auth URL received');
@@ -58,28 +59,53 @@ export class AuthService {
     }
   }
 
-  handleGoogleCallback(code: string): Observable<AuthResponse> {
+  async initiateGoogleConnect(): Promise<void> {
+    try {
+      console.log('Initiating Google account connection');
+      const response = await this.http.get<{url: string}>(
+        `${this.apiUrl}/auth/google-auth-url?connect_account=true`
+      ).toPromise();
+
+      if (response?.url) {
+        localStorage.setItem('returnUrl', window.location.pathname);
+        window.location.href = response.url;
+      } else {
+        throw new Error('No connect URL received');
+      }
+    } catch (error) {
+      console.error('Failed to get connect URL:', error);
+      throw error;
+    }
+  }
+
+  handleGoogleCallback(code: string, state: string = 'login'): Observable<AuthResponse> {
     console.log('Handling Google callback with code');
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/exchange-code`, { code }).pipe(
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/exchange-code`, { code, state }).pipe(
       tap(response => {
         console.log('Received auth response:', response);
-        this.handleAuthResponse(response);
+        // Only update auth state for login flow, not for connect flow
+        if (!state.startsWith('connect_')) {
+          this.handleAuthResponse(response);
+        }
       })
     );
   }
 
-  handleDirectCallback(params: any): Observable<any> {
+  handleDirectCallback(params: any): Observable<AuthResponse> {
     console.log('Handling direct callback with params:', params);
-    // Handle the direct response from backend redirect
     const response: AuthResponse = {
       access_token: params.access_token,
       token_type: params.token_type,
-      gmail_account_id: parseInt(params.gmail_account_id)
+      gmail_account_id: parseInt(params.gmail_account_id),
+      message: params.message
     };
-    
+
     return new Observable(observer => {
       try {
-        this.handleAuthResponse(response);
+        // Only update auth state if this is not a connect flow
+        if (!params.message?.includes('connected')) {
+          this.handleAuthResponse(response);
+        }
         observer.next(response);
         observer.complete();
       } catch (error) {
@@ -92,8 +118,6 @@ export class AuthService {
     console.log('Handling auth response');
     localStorage.setItem('accessToken', response.access_token);
     this.accessTokenSubject.next(response.access_token);
-    
-    // After getting the token, fetch user info
     this.fetchCurrentUser();
   }
 
@@ -116,7 +140,6 @@ export class AuthService {
 
   logout(): void {
     console.log('Logging out');
-    // Clear all auth data
     localStorage.removeItem('currentUser');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('returnUrl');
